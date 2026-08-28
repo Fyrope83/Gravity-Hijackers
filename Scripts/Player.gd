@@ -34,9 +34,14 @@ signal health_changed(health_value)
 @onready var player_scene_instantiated = player_scene.instantiate()
 @onready var world_scene_instantiated = world_scene.instantiate()
 
+#Guns
+var gun = 1
+var pistol_ammo_count = 15
+var perry_ammo_count = 30
+
 #Stats
 var health = 10
-var ammo_count = 15
+
 var bullet_damage = 2
 var SPEED = 5.5
 var JUMP_VELOCITY = 10
@@ -81,7 +86,7 @@ func _unhandled_input(event):
 		upd_ammo(0, true) # call reload update
 	
 	#ALL SHOOTING STUFF, IT WORKS, DO NOT CHANGE IT UNLESS RHYS
-	if Input.is_action_just_pressed("shoot") and anim_player.current_animation != "shoot" and ammo_count > 0:
+	if Input.is_action_just_pressed("shoot") and anim_player.current_animation != "shoot" and pistol_ammo_count > 0 and gun == 1:
 		upd_ammo(-1)
 		play_shoot_effects.rpc()
 		
@@ -118,6 +123,9 @@ func _unhandled_input(event):
 			# damage player only (enemy has no receive damage method)
 			if hit_obj in get_tree().get_nodes_in_group("Player"):
 				hit_obj.receive_damage.rpc_id(hit_obj.get_multiplayer_authority(), headshot) # pass bool as arg for headshot
+
+	if Input.is_action_just_pressed("shoot") and anim_player.current_animation != "shoot" and pistol_ammo_count > 0 and gun == 1:
+		pass
 
 func _physics_process(delta): #Occurs every delta frame
 	speed_pickup_scene_instantiated = get_parent().get_node("Speed_Pickup") #Speed Changing, WIP: TALK TO JAYDAN
@@ -249,11 +257,11 @@ func upd_ammo(num: int, reload: bool = false):
 		crosshair.hide()
 		await get_tree().create_timer(1).timeout
 		crosshair.show()
-		ammo_count = 15
+		pistol_ammo_count = 15
 		reloading = false
 	else:
-		ammo_count += num
-	ammo_display.text = "%d / 15" % ammo_count
+		pistol_ammo_count += num
+	ammo_display.text = "%d / 15" % pistol_ammo_count
 
 func _on_speed_pickup_pickedup(value):
 	print("SPEED_PICKUP")

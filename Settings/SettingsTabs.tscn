@@ -29,9 +29,10 @@ offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
 tab_alignment = 1
-current_tab = 0
+current_tab = 3
 
 [node name="General" type="TabBar" parent="TabContainer" unique_id=1194515287]
+visible = false
 layout_mode = 2
 theme_override_constants/outline_size = 10
 theme_override_font_sizes/font_size = 32
@@ -194,7 +195,6 @@ layout_mode = 2
 bus_name = "SFX"
 
 [node name="Controls" type="TabBar" parent="TabContainer" unique_id=330908642]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 
@@ -252,6 +252,10 @@ action_name = "player_crouch"
 [node name="Hotkeys9" parent="TabContainer/Controls/MarginContainer/ScrollContainer/VBoxContainer" unique_id=226552547 instance=ExtResource("2_hc7o7")]
 layout_mode = 2
 action_name = "reload"
+
+[node name="Hotkeys11" parent="TabContainer/Controls/MarginContainer/ScrollContainer/VBoxContainer" unique_id=170263676 instance=ExtResource("2_hc7o7")]
+layout_mode = 2
+action_name = "flip_gravity"
 
 [node name="Hotkeys10" parent="TabContainer/Controls/MarginContainer/ScrollContainer/VBoxContainer" unique_id=829451642 instance=ExtResource("2_hc7o7")]
 layout_mode = 2
