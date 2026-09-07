@@ -40,14 +40,17 @@ project/assembly_name="MultiplayerFPSTemplate"
 [file_customization]
 
 folder_colors={
-"res://Scripts/": "purple",
-"res://Settings/": "pink",
-"res://Settings/tabs/Scripts/": "gray",
+"res://Scripts/": "green",
+"res://Settings/": "teal",
+"res://Settings/tabs/": "blue",
+"res://Settings/tabs/Scripts/": "purple",
+"res://WeaponManager/": "blue",
 "res://assets/": "red",
 "res://assets/images/": "orange",
 "res://assets/sound/": "yellow",
-"res://models/": "green",
-"res://scenes/": "teal"
+"res://models/": "orange",
+"res://scenes/": "yellow",
+"res://scenes/GravityShift/": "green"
 }
 
 [filesystem]
