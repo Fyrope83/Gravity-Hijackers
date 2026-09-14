@@ -44,6 +44,7 @@ var SPEED = 5.5
 var JUMP_VELOCITY = 10
 var gravity_strengths = [3, 1.5, 0.75, 0.375]
 var gravity_direction = 1
+var knockback_strength = 30
 
 #MISC
 @export var X_mouse_sensitivity = 0.01
@@ -90,6 +91,7 @@ func _unhandled_input(event):
 		if raycast.is_colliding():
 			var hit_obj = raycast.get_collider()
 			var hit_coords = raycast.get_collision_point()
+			var hit_direction = (raycast.target_position - raycast.position).normalized()
 			var relative_hit_coords = hit_coords - hit_obj.position # relative to the colliding object
 			var headshot = true if relative_hit_coords.y >= 1.4 else false # above 1.4 is roughly where the player's head is
 			# avoid nesting, also prevents friendly fire
@@ -119,7 +121,7 @@ func _unhandled_input(event):
 			
 			# damage player only (enemy has no receive damage method)
 			if hit_obj in get_tree().get_nodes_in_group("Player"):
-				hit_obj.receive_damage.rpc_id(hit_obj.get_multiplayer_authority(), headshot) # pass bool as arg for headshot
+				hit_obj.receive_damage.rpc_id(hit_obj.get_multiplayer_authority(), headshot, hit_direction) # pass bool as arg for headshot
 
 func _physics_process(delta): #Occurs every delta frame
 	speed_pickup_scene_instantiated = get_parent().get_node("Speed_Pickup") #Speed Changing, WIP: TALK TO JAYDAN
@@ -157,7 +159,7 @@ func _physics_process(delta): #Occurs every delta frame
 	if (not is_on_floor() and gravity_direction == 1) or (not is_on_ceiling() and gravity_direction == -1):
 		velocity.y -= default_gravity * gravity_direction * gravity_strengths[int(grav_slider.value)] * delta
 	
-	if Input.is_action_just_pressed("player_jump") and (is_on_floor() or is_on_ceiling()):
+	if Input.is_action_pressed("player_jump") and (is_on_floor() or is_on_ceiling()):
 		velocity.y = JUMP_VELOCITY if is_on_floor() else -JUMP_VELOCITY if is_on_ceiling() else int(velocity.y) # wrap velocity.y in int to get ternary warnings to pipe down
 
 	#SPRINTING AND CROUCHING
@@ -230,7 +232,9 @@ func play_shoot_effects():
 	muzzle_flash.emitting = true
 
 @rpc("any_peer")
-func receive_damage(headshot: bool):
+func receive_damage(headshot: bool, hit_direction):
+	print(hit_direction * knockback_strength)
+	velocity += hit_direction * knockback_strength
 	health -= bullet_damage*2 if headshot else bullet_damage
 	if health <= 0:
 		health = 10
