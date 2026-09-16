@@ -91,7 +91,7 @@ func _unhandled_input(event):
 		if raycast.is_colliding():
 			var hit_obj = raycast.get_collider()
 			var hit_coords = raycast.get_collision_point()
-			var hit_direction = (raycast.target_position - raycast.position).normalized()
+			var hit_direction = (hit_coords - raycast.global_position).normalized()
 			var relative_hit_coords = hit_coords - hit_obj.position # relative to the colliding object
 			var headshot = true if relative_hit_coords.y >= 1.4 else false # above 1.4 is roughly where the player's head is
 			# avoid nesting, also prevents friendly fire
@@ -137,9 +137,9 @@ func _physics_process(delta): #Occurs every delta frame
 	if direction:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+		print(velocity.x, " ",  velocity.z)
+	velocity.x = move_toward(velocity.x, 0, 0.2)
+	velocity.z = move_toward(velocity.z, 0, 0.2)
 	
 	#JUMPING AND GRAVITY
 	if Input.is_action_just_pressed("flip_gravity") and grav_flip_timer.time_left == 0:
@@ -234,7 +234,7 @@ func play_shoot_effects():
 @rpc("any_peer")
 func receive_damage(headshot: bool, hit_direction):
 	print(hit_direction * knockback_strength)
-	velocity += hit_direction * knockback_strength
+	velocity = hit_direction * knockback_strength
 	health -= bullet_damage*2 if headshot else bullet_damage
 	if health <= 0:
 		health = 10
