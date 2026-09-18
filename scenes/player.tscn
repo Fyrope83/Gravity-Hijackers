@@ -5,6 +5,8 @@
 [ext_resource type="Texture2D" uid="uid://vwob30tkwej4" path="res://addons/kenney_particle_pack/star_06.png" id="3_27dhu"]
 [ext_resource type="AudioStream" uid="uid://cddr268ryi66b" path="res://assets/sound/gun/gunshot1.mp3" id="4_dqkch"]
 [ext_resource type="PackedScene" uid="uid://d2dbwf6nflgkw" path="res://models/Gun2.tscn" id="5_qlg0r"]
+[ext_resource type="Resource" uid="uid://df3abs7dow0av" path="res://WeaponManager/Pistol/Pistol.tres" id="6_smehm"]
+[ext_resource type="PackedScene" uid="uid://tclgjg0aatgs" path="res://WeaponManager/Weapon_manager.tscn" id="8_smehm"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_anhm7"]
 
@@ -43,6 +45,10 @@ particles_anim_loop = false
 material = SubResource("StandardMaterial3D_4smqo")
 size = Vector2(0.5, 0.5)
 orientation = 2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_x7k0j"]
+radius = 0.1
+height = 1.0
 
 [sub_resource type="Animation" id="Animation_qhqgy"]
 resource_name = "Crouch"
@@ -562,6 +568,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.51306, 0)
 
 [node name="Gun2" parent="Camera3D" unique_id=693693121 instance=ExtResource("5_qlg0r")]
 transform = Transform3D(-1.7484556e-08, 0, 0.4, 0, 0.4, 0, -0.4, 0, -1.7484556e-08, 0.5, -0.75, -0.3)
+visible = false
 
 [node name="RayCast3D" type="RayCast3D" parent="Camera3D" unique_id=1804038237]
 target_position = Vector3(0, 0, -50)
@@ -569,6 +576,7 @@ collision_mask = 2
 
 [node name="Pistol" parent="Camera3D" unique_id=158055108 instance=ExtResource("2_dqkch")]
 transform = Transform3D(1.0000001, 0, 0, 0, 0.89879405, -0.43837127, 0, 0.43837115, 0.8987943, 0.5, -0.186, -0.5)
+visible = false
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Camera3D/Pistol" unique_id=215553547]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.084553175, 0.11784935, -0.34567696)
@@ -579,6 +587,15 @@ one_shot = true
 local_coords = true
 process_material = SubResource("ParticleProcessMaterial_uu53b")
 draw_pass_1 = SubResource("PlaneMesh_b2g4i")
+
+[node name="ViewModel" type="Node3D" parent="Camera3D" unique_id=1640886993]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.186, -0.5)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Camera3D" unique_id=1664418098]
+transform = Transform3D(1, 0, 0, 0, 0.2330347, 0.97246844, 0, -0.97246844, 0.2330347, 0.46368873, -0.34949493, -0.119731784)
+visible = false
+mesh = SubResource("CapsuleMesh_x7k0j")
+skeleton = NodePath("../..")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1889766177]
 libraries/ = SubResource("AnimationLibrary_p6wdk")
@@ -605,5 +622,12 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 text = "hi"
+
+[node name="Weapon_Manager" parent="." unique_id=1026124955 node_paths=PackedStringArray("player", "Bullet_raycast", "view_model_container") instance=ExtResource("8_smehm")]
+visible = false
+current_weapon = ExtResource("6_smehm")
+player = NodePath("..")
+Bullet_raycast = NodePath("../Camera3D/RayCast3D")
+view_model_container = NodePath("../Camera3D/ViewModel")
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

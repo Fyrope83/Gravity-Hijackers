@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WeaponResource" format=3 uid="uid://df3abs7dow0av"]
+
+[ext_resource type="Script" uid="uid://dmb83f6yt7uhm" path="res://WeaponManager/Weapon_Resource.gd" id="1_382ty"]
+[ext_resource type="PackedScene" uid="uid://cf1dcxwv6bvl3" path="res://models/Pistol.glb" id="2_1vr1d"]
+
+[resource]
+script = ExtResource("1_382ty")
+view_model = ExtResource("2_1vr1d")
+view_model_pos = Vector3(0, -0.5, 0)
+view_idle_anim = "idle"
+view_equip_anim = "EquipGun"
+view_shoot_anim = "shoot"
+metadata/_custom_type_script = "uid://dmb83f6yt7uhm"

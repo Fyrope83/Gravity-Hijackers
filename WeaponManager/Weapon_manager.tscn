@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://tclgjg0aatgs"]
 
-[ext_resource type="Script" uid="uid://j1dk03g0tka3" path="res://assets/Weapons/Scripts/Weapon_controller.gd" id="1_iaept"]
+[ext_resource type="Script" uid="uid://j1dk03g0tka3" path="res://WeaponManager/Weapon_manager.gd" id="1_iaept"]
 
-[node name="Node3D" type="Node3D" unique_id=1026124955]
+[node name="Weapon_Manager" type="Node3D" unique_id=1026124955]
 script = ExtResource("1_iaept")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=256323657]
