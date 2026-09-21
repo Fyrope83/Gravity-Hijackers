@@ -44,7 +44,7 @@ var SPEED = 5.5
 var JUMP_VELOCITY = 10
 var gravity_strengths = [3, 1.5, 0.75, 0.375]
 var gravity_direction = 1
-var knockback_strength = 30
+var knockback_strength = 15
 
 #MISC
 @export var X_mouse_sensitivity = 0.01
@@ -135,11 +135,12 @@ func _physics_process(delta): #Occurs every delta frame
 	var input_dir = Input.get_vector("left", "right", "up", "down")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = move_toward(velocity.x, direction.x * SPEED, 1 if is_on_floor() or is_on_ceiling() else 0.2)
+		velocity.z = move_toward(velocity.z, direction.z * SPEED, 1 if is_on_floor() or is_on_ceiling() else 0.2)
 		print(velocity.x, " ",  velocity.z)
-	velocity.x = move_toward(velocity.x, 0, 0.2)
-	velocity.z = move_toward(velocity.z, 0, 0.2)
+	else:
+		velocity.x = move_toward(velocity.x, 0, 1 if is_on_floor() or is_on_ceiling() else 0.2)
+		velocity.z = move_toward(velocity.z, 0, 1 if is_on_floor() or is_on_ceiling() else 0.2)
 	
 	#JUMPING AND GRAVITY
 	if Input.is_action_just_pressed("flip_gravity") and grav_flip_timer.time_left == 0:
@@ -159,7 +160,7 @@ func _physics_process(delta): #Occurs every delta frame
 	if (not is_on_floor() and gravity_direction == 1) or (not is_on_ceiling() and gravity_direction == -1):
 		velocity.y -= default_gravity * gravity_direction * gravity_strengths[int(grav_slider.value)] * delta
 	
-	if Input.is_action_pressed("player_jump") and (is_on_floor() or is_on_ceiling()):
+	if Input.is_action_pressed("player_jump") and ((is_on_floor() and gravity_direction == 1) or (is_on_ceiling() and gravity_direction == -1)):
 		velocity.y = JUMP_VELOCITY if is_on_floor() else -JUMP_VELOCITY if is_on_ceiling() else int(velocity.y) # wrap velocity.y in int to get ternary warnings to pipe down
 
 	#SPRINTING AND CROUCHING
