@@ -6,12 +6,14 @@ extends Node3D
 @export var player : CharacterBody3D
 @export var Bullet_raycast : RayCast3D
 @export var view_model_container : Node3D
+@export var world_model_container : Node3D
+
 @export var current_weapon_view_model : Node3D
 
 #@export var weapon_model_parent: Node3D
 
 
-#var current_weapon_model: Node3D
+var current_weapon_model: Node3D
 
 func update_weapon_model() -> void:
 	if current_weapon != null:

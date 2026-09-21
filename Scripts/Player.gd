@@ -195,6 +195,8 @@ func _physics_process(delta): #Occurs every delta frame
 		pass
 	elif anim_player.current_animation in ["Crouch", "Uncrouch"]:
 		pass
+	elif anim_player.current_animation == "Reload":
+		pass
 	elif input_dir != Vector2.ZERO and is_on_floor():
 		anim_player.play("move")
 	else:
@@ -253,6 +255,7 @@ func _Y_on_mouse_sens_updated(value):
 func upd_ammo(num: int, reload: bool = false):
 	if reload:
 		reloading = true
+		anim_player.play("Reload")
 		crosshair.hide()
 		await get_tree().create_timer(1).timeout
 		crosshair.show()

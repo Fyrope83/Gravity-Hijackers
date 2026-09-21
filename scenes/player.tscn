@@ -46,10 +46,6 @@ material = SubResource("StandardMaterial3D_4smqo")
 size = Vector2(0.5, 0.5)
 orientation = 2
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_x7k0j"]
-radius = 0.1
-height = 1.0
-
 [sub_resource type="Animation" id="Animation_qhqgy"]
 resource_name = "Crouch"
 length = 0.5
@@ -329,6 +325,35 @@ tracks/8/keys = {
 "values": [Vector3(0, 1.5707964, 0)]
 }
 
+[sub_resource type="Animation" id="Animation_fjrip"]
+resource_name = "Reload"
+length = 1.1
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D/Pistol:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.5, -0.186, -0.5), Vector3(0.3, -0.25, -0.7), Vector3(0.5, -0.186, -0.5)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D/Pistol:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(1.5707964, 1.5707964, 0), Vector3(3.1415927, 1.5707964, 0), Vector3(4.712389, 1.5707964, 0), Vector3(6.2831855, 1.5707964, 0), Vector3(0.4537856, 0, 0)]
+}
+
 [sub_resource type="Animation" id="Animation_dqkch"]
 resource_name = "Uncrouch"
 step = 60.0
@@ -534,6 +559,7 @@ _data = {
 &"EquipGun": SubResource("Animation_qlg0r"),
 &"EquipGun2": SubResource("Animation_tuyoq"),
 &"RESET": SubResource("Animation_jhgv2"),
+&"Reload": SubResource("Animation_fjrip"),
 &"Uncrouch": SubResource("Animation_dqkch"),
 &"idle": SubResource("Animation_knepc"),
 &"move": SubResource("Animation_qcgne"),
@@ -550,6 +576,14 @@ properties/1/replication_mode = 1
 properties/2/path = NodePath("Camera3D:rotation")
 properties/2/spawn = true
 properties/2/replication_mode = 1
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_x7k0j"]
+radius = 0.1
+height = 1.0
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o5w4n"]
+radius = 0.1
+height = 1.0
 
 [node name="Player" type="CharacterBody3D" unique_id=820130408 groups=["Player"]]
 collision_layer = 3
@@ -591,12 +625,6 @@ draw_pass_1 = SubResource("PlaneMesh_b2g4i")
 [node name="ViewModel" type="Node3D" parent="Camera3D" unique_id=1640886993]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.186, -0.5)
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="Camera3D" unique_id=1664418098]
-transform = Transform3D(1, 0, 0, 0, 0.2330347, 0.97246844, 0, -0.97246844, 0.2330347, 0.46368873, -0.34949493, -0.119731784)
-visible = false
-mesh = SubResource("CapsuleMesh_x7k0j")
-skeleton = NodePath("../..")
-
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1889766177]
 libraries/ = SubResource("AnimationLibrary_p6wdk")
 autoplay = &"idle"
@@ -623,11 +651,37 @@ offset_right = 40.0
 offset_bottom = 23.0
 text = "hi"
 
-[node name="Weapon_Manager" parent="." unique_id=1026124955 node_paths=PackedStringArray("player", "Bullet_raycast", "view_model_container") instance=ExtResource("8_smehm")]
-visible = false
+[node name="Weapon_Manager" parent="." unique_id=1026124955 node_paths=PackedStringArray("player", "Bullet_raycast", "view_model_container", "current_weapon_view_model") instance=ExtResource("8_smehm")]
 current_weapon = ExtResource("6_smehm")
 player = NodePath("..")
 Bullet_raycast = NodePath("../Camera3D/RayCast3D")
 view_model_container = NodePath("../Camera3D/ViewModel")
+current_weapon_view_model = NodePath("../Camera3D/ViewModel")
+
+[node name="Skeleton3D" type="Skeleton3D" parent="." unique_id=1433119838]
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Skeleton3D" unique_id=1737415895]
+
+[node name="Arm" type="PhysicalBone3D" parent="Skeleton3D" unique_id=1645190098]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11271787, -0.29714227)
+joint_type = 3
+joint_offset = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.11271787, 0.29714227)
+body_offset = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11271787, -0.29714227)
+joint_constraints/angular_limit_enabled = false
+joint_constraints/angular_limit_upper = 90.0
+joint_constraints/angular_limit_lower = -90.0
+joint_constraints/angular_limit_bias = 0.3
+joint_constraints/angular_limit_softness = 0.9
+joint_constraints/angular_limit_relaxation = 1.0
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Skeleton3D/Arm" unique_id=1664418098]
+transform = Transform3D(1, 0, 0, 0, 0.2330347, 0.97246844, 0, -0.97246844, 0.2330347, 0.46368873, 1.163565, -0.119731784)
+visible = false
+mesh = SubResource("CapsuleMesh_x7k0j")
+skeleton = NodePath("../../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Skeleton3D/Arm" unique_id=1734328029]
+transform = Transform3D(1, 0, 0, 0, 0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0.464, 1.164, -0.12)
+shape = SubResource("CapsuleShape3D_o5w4n")
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

@@ -1,7 +1,7 @@
 class_name WeaponResource
 extends Resource
 
-@export var damage = 2
+@export var damage = 2.0
 
 @export var view_model : PackedScene
 
