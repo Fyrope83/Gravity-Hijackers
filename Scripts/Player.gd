@@ -44,7 +44,7 @@ var SPEED = 5.5
 var JUMP_VELOCITY = 10
 var gravity_strengths = [3, 1.5, 0.75, 0.375]
 var gravity_direction = 1
-var knockback_strength = 15
+var knockback_strength = 12
 
 #MISC
 @export var X_mouse_sensitivity = 0.01
@@ -134,13 +134,13 @@ func _physics_process(delta): #Occurs every delta frame
 	
 	var input_dir = Input.get_vector("left", "right", "up", "down")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var dir_change_strength = SPEED if (is_on_floor() and gravity_direction == 1) or (is_on_ceiling() and gravity_direction == -1) else 10 * gravity_strengths[int(grav_slider.value)] * delta
 	if direction:
-		velocity.x = move_toward(velocity.x, direction.x * SPEED, 1 if is_on_floor() or is_on_ceiling() else 0.2)
-		velocity.z = move_toward(velocity.z, direction.z * SPEED, 1 if is_on_floor() or is_on_ceiling() else 0.2)
-		print(velocity.x, " ",  velocity.z)
+		velocity.x = move_toward(velocity.x, direction.x * SPEED, dir_change_strength)
+		velocity.z = move_toward(velocity.z, direction.z * SPEED, dir_change_strength)
 	else:
-		velocity.x = move_toward(velocity.x, 0, 1 if is_on_floor() or is_on_ceiling() else 0.2)
-		velocity.z = move_toward(velocity.z, 0, 1 if is_on_floor() or is_on_ceiling() else 0.2)
+		velocity.x = move_toward(velocity.x, 0, dir_change_strength)
+		velocity.z = move_toward(velocity.z, 0, dir_change_strength)
 	
 	#JUMPING AND GRAVITY
 	if Input.is_action_just_pressed("flip_gravity") and grav_flip_timer.time_left == 0:
@@ -151,7 +151,7 @@ func _physics_process(delta): #Occurs every delta frame
 		#rotation.y = -rotation.y # correct flip reversal
 		#camera.rotation.x = -camera.rotation.x # correct flip reversal
 		#position -= Vector3(0, 2*gravity_direction, 0) # keep player pos after instant flip
-	rotation.z = lerp_angle(rotation.z, PI if gravity_direction == -1 else 0, 5*delta)
+	rotation.z = lerp_angle(rotation.z, PI if gravity_direction == -1 else 0.0, 5*delta)
 	if grav_flip_timer.time_left == 0:
 		flip_cd_label.text = ""
 	else:
