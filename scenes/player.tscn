@@ -611,6 +611,7 @@ collision_mask = 2
 [node name="ViewModel" type="Node3D" parent="Camera3D" unique_id=1640886993]
 
 [node name="Pistol" parent="Camera3D/ViewModel" unique_id=158055108 instance=ExtResource("2_dqkch")]
+
 transform = Transform3D(1.0000001, 0, 0, 0, 0.89879405, -0.43837127, 0, 0.43837115, 0.8987943, 0.5, -0.186, -0.5)
 
 [node name="MuzzleFlash" type="GPUParticles3D" parent="Camera3D/ViewModel/Pistol" unique_id=215553547]
@@ -713,5 +714,14 @@ skeleton = NodePath("../../..")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Skeleton3D/Arm" unique_id=1734328029]
 transform = Transform3D(1, 0, 0, 0, 0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0.464, 1.164, -0.12)
 shape = SubResource("CapsuleShape3D_o5w4n")
+
+[node name="Gun2" parent="." unique_id=693693121 instance=ExtResource("5_qlg0r")]
+transform = Transform3D(-2.1855694e-08, 0, 0.5, 0, 0.5, 0, -0.5, 0, -2.1855694e-08, -0.62836176, 0.5720277, 0.3218732)
+visible = false
+
+[node name="GravFlipTimer" type="Timer" parent="." unique_id=187622579]
+wait_time = 0.6
+one_shot = true
+
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

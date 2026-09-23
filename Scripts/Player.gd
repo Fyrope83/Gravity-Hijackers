@@ -12,6 +12,8 @@ signal health_changed(health_value)
 @onready var crosshair = Global.worldNode.hud.get_node("Crosshair")
 @onready var ammo_display = Global.worldNode.hud.get_node("AmmoDisplay")
 @onready var grav_slider = Global.worldNode.hud.get_node("GravitySlider")
+@onready var flip_cd_label = Global.worldNode.hud.get_node("FlipCooldownLabel")
+@onready var grav_flip_timer = $GravFlipTimer
 
 #Preloads
 @onready var damage_billboard = preload("res://scenes/DamageIndicator.tscn")
@@ -22,7 +24,8 @@ signal health_changed(health_value)
 
 #Pickups
 @onready var default_gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
-@onready var speed_pickup_scene_instantiated = get_parent().get_node("Speed_Pickup")
+@onready var speed_pickup_scene_instantiated = get_tree().get_nodes_in_group("speed_pickups")
+#get_parent().get_node("Speed_Pickup")
 @onready var speed_pickup_multiplier = 1
 
 #Crouching
@@ -47,6 +50,7 @@ var SPEED = 5.5
 var JUMP_VELOCITY = 10
 var gravity_strengths = [3, 1.5, 0.75, 0.375]
 var gravity_direction = 1
+var knockback_strength = 12
 
 #MISC
 @export var X_mouse_sensitivity = 0.01
@@ -93,6 +97,7 @@ func _unhandled_input(event):
 		if raycast.is_colliding():
 			var hit_obj = raycast.get_collider()
 			var hit_coords = raycast.get_collision_point()
+			var hit_direction = (hit_coords - raycast.global_position).normalized()
 			var relative_hit_coords = hit_coords - hit_obj.position # relative to the colliding object
 			var headshot = true if relative_hit_coords.y >= 1.4 else false # above 1.4 is roughly where the player's head is
 			# avoid nesting, also prevents friendly fire
@@ -122,13 +127,14 @@ func _unhandled_input(event):
 			
 			# damage player only (enemy has no receive damage method)
 			if hit_obj in get_tree().get_nodes_in_group("Player"):
-				hit_obj.receive_damage.rpc_id(hit_obj.get_multiplayer_authority(), headshot) # pass bool as arg for headshot
+				hit_obj.receive_damage.rpc_id(hit_obj.get_multiplayer_authority(), headshot, hit_direction) # pass bool as arg for headshot
 
 	if Input.is_action_just_pressed("shoot") and anim_player.current_animation != "shoot" and pistol_ammo_count > 0 and gun == 1:
 		pass
 
 func _physics_process(delta): #Occurs every delta frame
-	speed_pickup_scene_instantiated = get_parent().get_node("Speed_Pickup") #Speed Changing, WIP: TALK TO JAYDAN
+	speed_pickup_scene_instantiated = speed_pickup_scene.instantiate
+	#get_parent().get_node("Speed_Pickup") #Speed Changing, WIP: TALK TO JAYDAN
 	if not is_multiplayer_authority(): return
 	
 	# Get the input direction and handle the movement/deceleration.
@@ -137,27 +143,33 @@ func _physics_process(delta): #Occurs every delta frame
 	
 	var input_dir = Input.get_vector("left", "right", "up", "down")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var dir_change_strength = SPEED if (is_on_floor() and gravity_direction == 1) or (is_on_ceiling() and gravity_direction == -1) else 10 * gravity_strengths[int(grav_slider.value)] * delta
 	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = move_toward(velocity.x, direction.x * SPEED, dir_change_strength)
+		velocity.z = move_toward(velocity.z, direction.z * SPEED, dir_change_strength)
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+		velocity.x = move_toward(velocity.x, 0, dir_change_strength)
+		velocity.z = move_toward(velocity.z, 0, dir_change_strength)
 	
 	#JUMPING AND GRAVITY
-	if Input.is_action_just_pressed("flip_gravity"):
+	if Input.is_action_just_pressed("flip_gravity") and grav_flip_timer.time_left == 0:
 		gravity_direction = -gravity_direction
+		grav_flip_timer.start()
 		# instant flip mechannics
 		#rotate_z(PI) # flip
 		#rotation.y = -rotation.y # correct flip reversal
 		#camera.rotation.x = -camera.rotation.x # correct flip reversal
 		#position -= Vector3(0, 2*gravity_direction, 0) # keep player pos after instant flip
-	rotation.z = lerp_angle(rotation.z, PI if gravity_direction == -1 else 0, 5*delta)
+	rotation.z = lerp_angle(rotation.z, PI if gravity_direction == -1 else 0.0, 5*delta)
+	if grav_flip_timer.time_left == 0:
+		flip_cd_label.text = ""
+	else:
+		flip_cd_label.text = "CD %.2fs" % grav_flip_timer.time_left
 	
 	if (not is_on_floor() and gravity_direction == 1) or (not is_on_ceiling() and gravity_direction == -1):
 		velocity.y -= default_gravity * gravity_direction * gravity_strengths[int(grav_slider.value)] * delta
 	
-	if Input.is_action_just_pressed("player_jump") and (is_on_floor() or is_on_ceiling()):
+	if Input.is_action_pressed("player_jump") and ((is_on_floor() and gravity_direction == 1) or (is_on_ceiling() and gravity_direction == -1)):
 		velocity.y = JUMP_VELOCITY if is_on_floor() else -JUMP_VELOCITY if is_on_ceiling() else int(velocity.y) # wrap velocity.y in int to get ternary warnings to pipe down
 
 	#SPRINTING AND CROUCHING
@@ -232,7 +244,9 @@ func play_shoot_effects():
 	muzzle_flash.emitting = true
 
 @rpc("any_peer")
-func receive_damage(headshot: bool):
+func receive_damage(headshot: bool, hit_direction):
+	print(hit_direction * knockback_strength)
+	velocity = hit_direction * knockback_strength
 	health -= bullet_damage*2 if headshot else bullet_damage
 	if health <= 0:
 		health = 10
