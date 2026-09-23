@@ -6,7 +6,7 @@ signal health_changed(health_value)
 #Assets
 @onready var camera = $Camera3D
 @onready var anim_player = $AnimationPlayer
-@onready var muzzle_flash = $Camera3D/Pistol/MuzzleFlash
+@onready var muzzle_flash = $Camera3D/ViewModel/Pistol/MuzzleFlash
 @onready var raycast = $Camera3D/RayCast3D
 @onready var camera_3d: Camera3D = $Camera3D
 @onready var crosshair = Global.worldNode.hud.get_node("Crosshair")
