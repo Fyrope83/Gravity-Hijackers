@@ -63,7 +63,7 @@ func _enter_tree(): #Starts the game, gives multiplayer authority for your contr
 	set_multiplayer_authority(str(name).to_int())
 
 func _ready(): #Plays on first entering the game
-	speed_pickup_scene_instantiated.speed_pickup_pickedup.connect(_on_speed_pickup_pickedup) #WIP, TALK TO JAYDAN
+	#speed_pickup_scene_instantiated.speed_pickup_pickedup.connect(_on_speed_pickup_pickedup) #WIP, TALK TO JAYDAN
 	if not is_multiplayer_authority(): return
 	
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED #Allows you to move camera

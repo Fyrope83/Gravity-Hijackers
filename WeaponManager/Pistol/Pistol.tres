@@ -7,7 +7,8 @@
 script = ExtResource("1_382ty")
 view_model = ExtResource("2_1vr1d")
 world_model = ExtResource("2_1vr1d")
-view_model_pos = Vector3(0.5, -0.25, -0.5)
+view_model_pos = Vector3(0.5, -1, -0.5)
+world_model_pos = Vector3(-5, -5, -5)
 view_idle_anim = "idle"
 view_equip_anim = "EquipGun"
 view_shoot_anim = "shoot"
