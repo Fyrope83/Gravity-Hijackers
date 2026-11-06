@@ -317,6 +317,9 @@ func crouch():
 		is_crouching = true
 
 func player_die():
+	perry_ammo_count = 30
+	pistol_ammo_count = 15
+	shotgun_ammo_count = 5
 	deaths += 1
 	respawn_timer.start()
 	velocity = Vector3.ZERO
